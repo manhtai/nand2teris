@@ -3,6 +3,23 @@
 // by Nisan and Schocken, MIT Press.
 // File name: projects/01/Not.hdl
 
+// Minimum parts in each chip
+// Not    1 OK
+// And    2 OK
+// Or    1
+// Xor    2
+// Mux    4
+// Dmux    2
+// Not16    16
+// And16    16
+// Or16    4
+// Mux16    4
+// Or8Way    3
+// Mux4Way16    3
+// Mux8Way16    3
+// DMux4Way    1
+// DMux8Way    1
+
 /**
  * Not gate:
  * out = not in
@@ -13,5 +30,5 @@ CHIP Not {
     OUT out;
 
     PARTS:
-    // Put your code here:
+    Nand (a=in, b=in, out=out);
 }
