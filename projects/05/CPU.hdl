@@ -39,5 +39,51 @@ CHIP CPU {
         pc[15];          // address of next instruction
 
     PARTS:
-    // Put your code here:
+    // A load is 1 when instruction[15] is 1 or instruction[5] is 1
+    Not (in=instruction[15], out=not15);
+    Or (a=not15, b=instruction[5], out=Aload);
+
+    // ARegister
+    ARegister (in=Ain, load=Aload, out=Aout, out[0..14]=addressM[0..14] );
+
+    // writeM when instruction[3] is 1 and instruction[15] is 1
+    And (a=instruction[15], b=instruction[3], out=writeM);
+
+    // Mux 1
+    Mux16 (a=instruction, b=ALUout, sel=instruction[15], out=Ain);
+
+    // Mux 2
+    Mux16 (a=Aout, b=inM, sel=instruction[12], out=ALUin);
+
+    // The ALU
+    ALU (x=Dout, y=ALUin,
+         zx=instruction[11], nx=instruction[10],
+         zy=instruction[9], ny=instruction[8],
+         f=instruction[7],
+         no=instruction[6],
+         out=ALUout, out=outM,
+         zr=zrout, ng=ngout);
+
+    // DRegister
+    And (a=instruction[15], b=instruction[4], out=Dload);
+    DRegister (in=ALUout, load=Dload, out=Dout);
+
+    // Jump manipulation
+    Not (in=ngout, out=notng);
+    Not (in=zrout, out=notzr);
+    And (a=notng, b=notzr, out=pos);
+
+    And (a=zrout, b=instruction[1], out=zrANDinstruction);
+    And (a=ngout, b=instruction[2], out=ngANDinstruction);
+    And (a=pos, b=instruction[0], out=posANDinstruction);
+
+    // Load PC when at least one jump instruction is equal to ALU output
+    Or (a=zrANDinstruction, b=ngANDinstruction, out=intermediateOR);
+    Or (a=intermediateOR, b=posANDinstruction, out=orOut);
+    // and not in the case of A instruction
+    And (a=orOut, b=instruction[15], out=pcload);
+
+    // If PC is loaded, incremence is disabled
+    Mux (a=true, b=false, sel=pcload, out=pcinc);
+    PC (in=Aout, load=pcload, inc=pcinc, reset=reset, out[0..14]=pc); 
 }

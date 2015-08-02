@@ -1,1 +1,1 @@
-Repos contain projects for [Nand2Teris course](https://www.coursera.org/course/nand2tetris1)
+Repo contains projects for [Nand2Teris course](https://www.coursera.org/course/nand2tetris1).
